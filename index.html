@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>امتحان React الشامل – Seacode Academy</title>
+<style>
+:root{--bg:#f4f8fb;--c:#fff;--t:#10222f;--m:#5b6f7d;--p:#0a7ea4;--p2:#0b5d7a;--ok:#14884a;--no:#c0392b;--b:#d7e3ea;--code:#0f1b24}
+@media(prefers-color-scheme:dark){:root{--bg:#0c151c;--c:#14212b;--t:#e6f0f6;--m:#94a9b6;--p:#3bb4dc;--p2:#7fd0ea;--ok:#43c47f;--no:#ff7a6b;--b:#25384a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:16px/1.7 system-ui,"Segoe UI",Tahoma,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--p2);color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+header b{font-size:18px}#tm{font:700 20px monospace;background:rgba(0,0,0,.25);padding:2px 12px;border-radius:8px;direction:ltr}#tm.low{background:var(--no)}
+main{max-width:860px;margin:auto;padding:16px}
+.card{background:var(--c);border:1px solid var(--b);border-radius:12px;padding:16px;margin:14px 0}
+h2{color:var(--p);margin:26px 0 4px}h3{margin:0 0 8px;font-size:16px}
+pre,code{direction:ltr;text-align:left;font-family:Consolas,monospace}
+pre{background:var(--code);color:#d6f1ff;padding:12px;border-radius:8px;overflow-x:auto;font-size:14px;margin:8px 0}
+code{background:rgba(10,126,164,.13);padding:0 5px;border-radius:4px}pre code{background:none;padding:0}
+label.o{display:block;padding:7px 10px;border:1px solid var(--b);border-radius:8px;margin:5px 0;cursor:pointer}
+label.o:hover{border-color:var(--p)}label.o.ok{border-color:var(--ok);background:rgba(20,136,74,.15)}label.o.no{border-color:var(--no);background:rgba(192,57,43,.15)}
+textarea{width:100%;min-height:150px;direction:ltr;font:14px Consolas,monospace;background:var(--code);color:#d6f1ff;border:1px solid var(--b);border-radius:8px;padding:10px}
+select{font:inherit;padding:2px 6px;border-radius:6px;background:var(--c);color:var(--t);border:1px solid var(--p)}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:9px 18px;background:var(--p);color:#fff}
+button.big{font-size:18px;padding:12px 28px;background:var(--ok)}
+.demo{display:flex;gap:14px;align-items:center;direction:ltr;margin:8px 0}.demo span{font:700 22px monospace}
+.res{margin-top:8px;font-size:14px;color:var(--m)}.good{color:var(--ok)}.bad{color:var(--no)}
+#score{display:none;text-align:center;font-size:20px;border:2px solid var(--p)}
+.ans{display:none;margin-top:8px;padding:8px;border-right:4px solid var(--ok);background:rgba(20,136,74,.1)}
+.sub{color:var(--m);font-size:14px}#bar{height:4px;background:#fff;width:0}
+body[data-l=ar] .en,body[data-l=en] .ar{display:none}
+html[dir=ltr] .ans{border-right:0;border-left:4px solid var(--ok)}
+#lg{background:rgba(255,255,255,.2);padding:4px 14px}
+</style></head><body data-l="ar">
+<header><b>🌊 Seacode Academy — <span class="ar">امتحان React الشامل</span><span class="en">Comprehensive React Exam</span></b><span id="pr"></span><button id="lg">English</button><span id="tm">60:00</span><div id="bar" style="width:100%"></div></header>
+<main>
+<div class="card"><h3><span class="ar">تعليمات</span><span class="en">Instructions</span></h3>
+<p class="sub"><span class="ar">المدة: 60 دقيقة. 4 أقسام: اختيار من متعدد، إكمال كود، جزء تفاعلي، وكتابة كود. يتم التسليم تلقائيًا عند انتهاء الوقت، والوقت محفوظ لو أعدت تحميل الصفحة. يمكنك تبديل اللغة في أي وقت بزر English / عربي.</span><span class="en">Duration: 60 minutes. 4 parts: multiple choice, code completion, an interactive part, and code writing. The exam auto-submits when time is up, and the timer survives a page reload. You can switch language anytime with the English / عربي button.</span></p>
+<label><span class="ar">اسم الطالب:</span><span class="en">Student name:</span> <input id="nm" style="font:inherit;padding:4px 8px;border-radius:6px;border:1px solid var(--b);background:var(--c);color:var(--t)"></label>
+<button id="st" style="margin-inline-start:12px"><span class="ar">ابدأ الامتحان</span><span class="en">Start exam</span></button></div>
+<div id="ex" style="display:none"></div>
+<div class="card" id="score"></div>
+</main>
+<script>
+const MCQ=[
+["ما هو <code>JSX</code>؟",["لغة برمجة بديلة لـ JavaScript","امتداد صيغة لـ JS يشبه HTML ويُحوَّل إلى JS","مكتبة CSS","محرك قوالب على السيرفر"],1],
+["أي Hook يُستخدم لإدارة الحالة داخل Function Component؟",["useEffect","useState","useRef","useMemo"],1],
+["ما الذي يرجعه <code>useState(0)</code>؟",["قيمة فقط","دالة فقط","مصفوفة: [state, setState]","كائن {state, setState}"],2],
+["لماذا نستخدم <code>key</code> عند عرض قائمة بـ <code>map</code>؟",["لتنسيق العناصر","لمساعدة React على تحديد العناصر التي تغيّرت أو أُضيفت أو حُذفت","لتشفير البيانات","ليس له فائدة"],1],
+["الـ <code>props</code> في React هي:",["قابلة للتعديل داخل المكوّن المستقبل لها","للقراءة فقط (Read-only) وتُمرَّر من الأب للابن","تُخزَّن في localStorage","نفس الـ state تمامًا"],1],
+["متى يُنفَّذ <code>useEffect(fn, [])</code>؟",["بعد كل render","مرة واحدة بعد أول render (Mount)","قبل أول render","عند كل تغيير state"],1],
+["ما وظيفة الـ cleanup function داخل <code>useEffect</code>؟",["تنظيف ملفات المشروع","تُنفَّذ عند Unmount أو قبل تشغيل الـ effect التالي لإلغاء الاشتراكات/المؤقتات","تمنع إعادة الـ render","تحذف الـ state"],1],
+["أي كود يعدّل الـ state بشكل خاطئ؟",["<code>setCount(count+1)</code>","<code>count++</code> مباشرة","<code>setCount(c=>c+1)</code>","<code>setItems([...items,x])</code>"],1],
+["ما هو الـ Virtual DOM؟",["نسخة من DOM في الذاكرة تقارنها React (Diffing) لتحديث الجزء المتغير فقط","متصفح افتراضي","قاعدة بيانات","مكتبة رسوميات"],0],
+["ما استخدام <code>useRef</code>؟",["تخزين قيمة تبقى بين الـ renders دون تسبب في re-render، أو الوصول لعنصر DOM","ربط الـ API","إدارة الـ routes","تنفيذ side effects"],0],
+["ما فائدة <code>useMemo</code>؟",["حفظ نتيجة حساب مكلف وإعادة حسابه فقط عند تغيّر الاعتماديات","حفظ دالة","إنشاء state","تحميل المكوّن بكسل"],0],
+["ما فائدة <code>useCallback</code>؟",["حفظ نتيجة قيمة","الحفاظ على نفس مرجع الدالة بين الـ renders ما دامت الاعتماديات ثابتة","استدعاء API","إنشاء Context"],1],
+["ما هدف <code>Context API</code>؟",["تسريع الـ render","مشاركة بيانات بين المكوّنات دون تمريرها عبر props في كل مستوى (Prop Drilling)","إدارة CSS","التعامل مع الـ forms فقط"],1],
+["متى نفضّل <code>useReducer</code> على <code>useState</code>؟",["دائمًا","عندما يكون الـ state معقدًا أو التحديثات تعتمد على بعضها بمنطق واضح (actions)","عند وجود متغير واحد","عند استخدام class"],1],
+["ما هو الـ Controlled Component؟",["عنصر فورم قيمته تأتي من state وتتحدث عبر onChange","مكوّن لا يملك props","مكوّن يستخدم ref فقط","مكوّن بلا JSX"],0],
+["ما وظيفة <code>React.memo</code>؟",["يمنع إعادة render للمكوّن إذا لم تتغير الـ props","يخزّن الـ state","يعدّل DOM مباشرة","ينشئ Context"],0],
+["مفهوم Lifting State Up يعني:",["نقل الـ state إلى أقرب أب مشترك لمشاركته بين مكوّنين","حذف الـ state","استخدام Redux فقط","نقل الـ state لـ localStorage"],0],
+["أيّ مما يلي صحيح للـ Conditional Rendering؟",["<code>{isOk && &lt;Msg/&gt;}</code>","<code>if(isOk) inside JSX</code> مباشرة","<code>&lt;if isOk&gt;</code>","<code>v-if</code>"],0],
+["ما فائدة <code>&lt;&gt;...&lt;/&gt;</code> (Fragment)؟",["تجميع عناصر دون إضافة عنصر DOM زائد","إضافة تنسيق","عمل Portal","عمل Lazy loading"],0],
+["في React Router، الفرق بين <code>&lt;Link&gt;</code> و <code>&lt;a&gt;</code> هو:",["Link تنتقل دون إعادة تحميل الصفحة كاملة","لا فرق","a أسرع","Link تعمل مع السيرفر فقط"],0],
+["ماذا يفعل <code>React.lazy</code> مع <code>Suspense</code>؟",["تحميل المكوّن عند الحاجة (Code Splitting) وعرض fallback أثناء التحميل","تأجيل الـ state","إلغاء الـ render","تخزين مؤقت للـ API"],0],
+["الـ Error Boundary يلتقط الأخطاء في:",["Event handlers","كود الـ render و lifecycle للمكوّنات الأبناء","الكود غير المتزامن (setTimeout)","كل ما سبق"],1],
+["قاعدة تسمية الـ Custom Hook:",["يجب أن يبدأ الاسم بـ <code>use</code>","يبدأ بـ hook","لا قاعدة","يبدأ بحرف كبير"],0],
+["من قواعد الـ Hooks:",["يمكن استدعاؤها داخل if و loops","تُستدعى فقط في المستوى الأعلى داخل Function Components أو Custom Hooks","تُستدعى داخل Class Components","تُستدعى داخل event handlers"],1],
+["لماذا قد ترى <code>console.log</code> مرتين في التطوير؟",["خطأ في الكود","<code>StrictMode</code> يشغّل بعض الدوال مرتين في التطوير لكشف المشاكل","بسبب الـ Router","بسبب الـ Virtual DOM"],1],
+["الفرق بين <code>useLayoutEffect</code> و <code>useEffect</code>:",["useLayoutEffect يعمل بشكل متزامن بعد تعديل DOM وقبل الرسم على الشاشة","لا فرق","useEffect أسرع دائمًا","useLayoutEffect للسيرفر فقط"],0],
+["ما المشكلة في <code>&lt;button onClick={handle()}&gt;</code>؟",["لا مشكلة","تُستدعى الدالة أثناء الـ render بدل عند الضغط؛ الصحيح <code>onClick={handle}</code>","الاسم خطأ","لا تعمل مع button"],1],
+["ما الفرق الأهم بين <code>Client-side Rendering</code> و <code>SSR</code>؟",["SSR يولّد HTML على السيرفر فيظهر المحتوى أسرع ويفيد SEO","CSR أسرع دائمًا","لا فرق","SSR لا يدعم React"],0]
+];
+const FILL=[
+{c:'const [count, <S>] = <S>(0);',a:[["setCount","setcount","set"],["useState","useEffect","useRef"]],k:[0,0]},
+{c:'useEffect(() => {\n  document.title = name;\n}, [<S>]);',a:[["name","count",""]],k:[0]},
+{c:'const Ctx = <S>(null);\nfunction App(){\n  return &lt;Ctx.<S> value={user}&gt;&lt;Page/&gt;&lt;/Ctx.<S>&gt;;\n}',a:[["createContext","useContext","createRef"],["Provider","Consumer","Wrapper"],["Provider","Consumer","Wrapper"]],k:[0,0,0]},
+{c:'const items = list.<S>(x => (\n  &lt;li <S>={x.id}&gt;{x.name}&lt;/li&gt;\n));',a:[["map","forEach","filter"],["key","id","index"]],k:[0,0]}
+];
+const CODE=[
+["اكتب مكوّن <code>Counter</code> فيه زر + وزر − وزر Reset، ويعرض العدد، ولا يسمح بقيمة أقل من 0.",["useState","setCount","onClick","Math.max|>\\s*0|>=\\s*0|<\\s*0|<=\\s*0","export|function|=>"],
+`function Counter(){
+  const [count,setCount]=useState(0);
+  return (<div>
+    <p>{count}</p>
+    <button onClick={()=>setCount(c=>c+1)}>+</button>
+    <button onClick={()=>setCount(c=>Math.max(0,c-1))}>-</button>
+    <button onClick={()=>setCount(0)}>Reset</button>
+  </div>);
+}`],
+["اكتب مكوّن <code>Users</code> يجلب قائمة مستخدمين من <code>/api/users</code> باستخدام <code>useEffect</code> مع حالة loading و error، ثم يعرضهم بـ map مع key.",["useState","useEffect","fetch","loading|Loading","error|catch","map","key"],
+`function Users(){
+  const [users,setUsers]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState(null);
+  useEffect(()=>{
+    fetch('/api/users').then(r=>r.json())
+      .then(setUsers).catch(setError).finally(()=>setLoading(false));
+  },[]);
+  if(loading) return <p>Loading...</p>;
+  if(error) return <p>Error</p>;
+  return <ul>{users.map(u=><li key={u.id}>{u.name}</li>)}</ul>;
+}`],
+["اكتب Custom Hook باسم <code>useLocalStorage(key, initial)</code> يعمل مثل useState لكن يحفظ القيمة في localStorage.",["function useLocalStorage|const useLocalStorage","useState","useEffect","localStorage.setItem","localStorage.getItem","JSON","return"],
+`function useLocalStorage(key,initial){
+  const [v,setV]=useState(()=>{
+    const s=localStorage.getItem(key);
+    return s?JSON.parse(s):initial;
+  });
+  useEffect(()=>{localStorage.setItem(key,JSON.stringify(v))},[key,v]);
+  return [v,setV];
+}`]
+];
+const EN=[
+["What is JSX?",["A new language replacing JS","A JS syntax extension that looks like HTML and compiles to JS","A CSS library","A server template engine"]],
+["Which Hook manages state in a function component?",["useEffect","useState","useRef","useMemo"]],
+["What does useState(0) return?",["A value only","A function only","An array: [state, setState]","An object {state, setState}"]],
+["Why use key when rendering a list with map?",["To style items","To help React identify which items changed, were added or removed","To encrypt data","It has no use"]],
+["Props in React are:",["Editable by the receiving component","Read-only, passed from parent to child","Stored in localStorage","Identical to state"]],
+["When does useEffect(fn, []) run?",["After every render","Once after the first render (mount)","Before the first render","On every state change"]],
+["What is the cleanup function in useEffect for?",["Cleaning project files","Runs on unmount or before the next effect, to cancel subscriptions/timers","Prevents re-render","Deletes state"]],
+["Which code mutates state incorrectly?",["setCount(count+1)","count++ directly","setCount(c=>c+1)","setItems([...items,x])"]],
+["What is the Virtual DOM?",["An in-memory DOM copy React diffs to update only what changed","A virtual browser","A database","A graphics library"]],
+["What is useRef used for?",["Keeping a value across renders without re-rendering, or accessing a DOM node","Calling APIs","Managing routes","Running side effects"]],
+["What is useMemo for?",["Caching an expensive computation, recomputing only when dependencies change","Caching a function","Creating state","Lazy-loading a component"]],
+["What is useCallback for?",["Caching a value","Keeping the same function reference across renders while dependencies are unchanged","Calling an API","Creating Context"]],
+["What is the goal of Context API?",["Speeding up render","Sharing data without passing props through every level (prop drilling)","Managing CSS","Handling forms only"]],
+["When to prefer useReducer over useState?",["Always","When state is complex or updates follow clear action-based logic","With a single variable","When using classes"]],
+["What is a Controlled Component?",["A form element whose value comes from state and updates via onChange","A component with no props","A component using refs only","A component without JSX"]],
+["What does React.memo do?",["Skips re-rendering if props haven't changed","Stores state","Edits DOM directly","Creates Context"]],
+["Lifting State Up means:",["Moving state to the closest common parent to share it","Deleting state","Using Redux only","Moving state to localStorage"]],
+["Which is valid conditional rendering?",["{isOk && <Msg/>}","if(isOk) directly inside JSX","<if isOk>","v-if"]],
+["What is a Fragment <>...</> for?",["Grouping elements without an extra DOM node","Adding styles","Creating a Portal","Lazy loading"]],
+["In React Router, Link vs <a>:",["Link navigates without a full page reload","No difference","a is faster","Link works on server only"]],
+["What do React.lazy and Suspense do?",["Load a component on demand (code splitting) and show a fallback meanwhile","Delay state","Cancel render","Cache API calls"]],
+["An Error Boundary catches errors in:",["Event handlers","Render and lifecycle of child components","Async code (setTimeout)","All of the above"]],
+["Custom Hook naming rule:",["The name must start with use","Starts with hook","No rule","Starts with a capital letter"]],
+["One of the Rules of Hooks:",["Can be called inside if and loops","Call only at the top level of function components or custom hooks","Call inside class components","Call inside event handlers"]],
+["Why might console.log print twice in development?",["A bug","StrictMode runs some functions twice in dev to surface problems","Because of the Router","Because of the Virtual DOM"]],
+["useLayoutEffect vs useEffect:",["useLayoutEffect runs synchronously after DOM updates and before paint","No difference","useEffect is always faster","useLayoutEffect is server-only"]],
+["What's wrong with <button onClick={handle()}>?",["Nothing","The function runs during render instead of on click; use onClick={handle}","Wrong name","Doesn't work with button"]],
+["Main difference between CSR and SSR?",["SSR generates HTML on the server so content shows faster and helps SEO","CSR is always faster","No difference","SSR doesn't support React"]]
+];
+const M=(qa,oa,qe,oe)=>{MCQ.push([qa,oa,0]);EN.push([qe,oe])};
+M("ما الفرق بين <code>state</code> و <code>props</code>؟",["state داخلي ويتغير داخل المكوّن، و props تأتي من الأب","لا فرق","props قابلة للتعديل و state لا","state للـ class فقط"],"What is the difference between state and props?",["State is internal and changeable; props come from the parent","No difference","Props are mutable, state is not","State is for classes only"]);
+M("عند تحديث state بنفس القيمة الحالية (Object.is) ماذا تفعل React غالبًا؟",["تتجاهل الـ re-render","تعمل render دائمًا","ترمي خطأ","تعمل Unmount"],"When state is set to the same value (Object.is), React usually:",["Skips the re-render","Always re-renders","Throws an error","Unmounts"]);
+M("أي طريقة صحيحة لإضافة عنصر لمصفوفة state؟",["<code>setItems([...items,x])</code>","<code>items.push(x)</code>","<code>items[items.length]=x</code>","<code>setItems(items.push(x))</code>"],"Which is the correct way to add an item to array state?",["setItems([...items,x])","items.push(x)","items[items.length]=x","setItems(items.push(x))"]);
+M("ما هو Prop Drilling؟",["تمرير props عبر مستويات وسيطة لا تحتاجها","نوع من Hooks","أداة debug","تحسين أداء"],"What is prop drilling?",["Passing props through intermediate levels that don't need them","A type of Hook","A debugging tool","A performance optimization"]);
+M("ما الغرض من الـ prop المسمى <code>children</code>؟",["استقبال المحتوى بين وسمي المكوّن","قائمة الأبناء في DOM فقط","تخزين state","معالجة الأحداث"],"What is the children prop for?",["Receiving the content between a component's tags","Only the list of DOM children","Storing state","Handling events"]);
+M("ما الذي يسبب re-render للمكوّن؟",["تغيّر state أو props أو إعادة render الأب","تغيّر متغير عادي <code>let</code>","تغيّر <code>ref.current</code>","تغيير الـ CSS"],"What causes a component to re-render?",["State or props change, or the parent re-rendering","Changing a plain let variable","Changing ref.current","Changing CSS"]);
+M("أي Hook تستخدمه لقراءة قيمة Context؟",["useContext","useProvider","useState","useReducer"],"Which Hook reads a Context value?",["useContext","useProvider","useState","useReducer"]);
+M("ما فائدة <code>Portal</code>؟",["عرض الأبناء في عقدة DOM خارج الأب (مثل Modal)","تحميل كسول","إدارة state","توجيه routes"],"What is a Portal useful for?",["Rendering children into a DOM node outside the parent (e.g. a Modal)","Lazy loading","Managing state","Routing"]);
+M("ما فائدة <code>forwardRef</code>؟",["تمرير ref من الأب إلى عنصر داخل الابن","تمرير props","نسخ state","تحميل مكوّن"],"What is forwardRef for?",["Passing a ref from a parent to an element inside the child","Passing props","Copying state","Loading a component"]);
+M("ما معنى Immutability في React؟",["عدم تعديل state الأصلي وإنشاء نسخة جديدة عند التحديث","منع التحديث","استخدام const فقط","حفظ state في ملف"],"What does immutability mean in React?",["Not mutating the original state; create a new copy on update","Preventing updates","Using const only","Saving state in a file"]);
+M("أي مما يلي يُعد Side Effect؟",["جلب بيانات من API","حساب مجموع مصفوفة داخل render","تنسيق نص","استخدام map"],"Which of these is a side effect?",["Fetching data from an API","Summing an array during render","Formatting text","Using map"]);
+M("ما هو Reconciliation؟",["خوارزمية مقارنة الشجرتين (Diffing) لتحديد ما يتحدث في DOM","ربط Redux","تجميع الملفات","فحص الأخطاء"],"What is reconciliation?",["The diffing algorithm comparing trees to decide what updates in the DOM","Connecting Redux","Bundling files","Error checking"]);
+M("في React Router v6 كيف نقرأ باراميتر <code>/users/:id</code>؟",["useParams","useState","useQuery","useLocation فقط"],"In React Router v6, how do you read /users/:id?",["useParams","useState","useQuery","Only useLocation"]);
+M("ما هو Redux Toolkit؟",["الطريقة الرسمية الموصى بها لكتابة منطق Redux بشكل مبسّط","بديل لـ JSX","مكتبة CSS","أداة بناء"],"What is Redux Toolkit?",["The official recommended way to write Redux logic in a simpler way","A JSX replacement","A CSS library","A build tool"]);
+M("ما الأداة الشائعة لاختبار مكوّنات React؟",["React Testing Library مع Jest/Vitest","Photoshop","Docker","Webpack"],"Which tool is commonly used to test React components?",["React Testing Library with Jest/Vitest","Photoshop","Docker","Webpack"]);
+M("ما فائدة <code>useTransition</code> (React 18)؟",["تمييز التحديثات غير العاجلة لإبقاء الواجهة متجاوبة","تنفيذ animation","جلب بيانات","تخزين state"],"What is useTransition (React 18) for?",["Marking non-urgent updates to keep the UI responsive","Running animations","Fetching data","Storing state"]);
+M("ما هي أفضل طريقة لتحديث state يعتمد على القيمة السابقة؟",["<code>setN(n=>n+1)</code>","<code>setN(n+1)</code> دائمًا","<code>n=n+1</code>","<code>this.n++</code>"],"Best way to update state based on its previous value?",["setN(n=>n+1)","Always setN(n+1)","n=n+1","this.n++"]);
+M("ما الـ Hook المناسب لتنفيذ كود عند تغيّر قيمة معينة؟",["<code>useEffect</code> مع مصفوفة اعتماديات","<code>useRef</code>","<code>useId</code>","<code>createElement</code>"],"Which Hook runs code when a specific value changes?",["useEffect with a dependency array","useRef","useId","createElement"]);
+FILL.push({c:'const [state, dispatch] = <S>(reducer, initialState);',a:[["useReducer","useState","useContext"]],k:[0]});
+FILL.push({c:'const inputRef = <S>(null);\n&lt;input ref={inputRef} /&gt;\ninputRef.<S>.focus();',a:[["useRef","createRef","useState"],["current","value","focus"]],k:[0,0]});
+const CODE_EN=["Write a Counter component with +, − and Reset buttons that shows the count and never goes below 0.","Write a Users component that fetches users from /api/users with useEffect, handles loading and error states, and renders them with map and key.","Write a custom hook useLocalStorage(key, initial) that works like useState but persists the value in localStorage.","Write a TodoList component with a controlled input and an Add button, listing tasks with a Delete button for each.","Create a ThemeContext with a ThemeProvider holding the theme (light/dark) and a toggle function, plus a component that consumes it with useContext."];
+CODE.push(["اكتب مكوّن <code>TodoList</code> فيه input متحكَّم به (controlled) وزر إضافة، ويعرض المهام وزر حذف لكل مهمة.",["useState","onChange","value=","map","key","filter","onClick"],
+`function TodoList(){
+  const [text,setText]=useState('');
+  const [todos,setTodos]=useState([]);
+  const add=()=>{ if(!text.trim())return; setTodos([...todos,{id:Date.now(),text}]); setText(''); };
+  return (<div>
+    <input value={text} onChange={e=>setText(e.target.value)}/>
+    <button onClick={add}>Add</button>
+    <ul>{todos.map(t=>(<li key={t.id}>{t.text}
+      <button onClick={()=>setTodos(todos.filter(x=>x.id!==t.id))}>x</button></li>))}</ul>
+  </div>);
+}`]);
+CODE.push(["اكتب <code>ThemeContext</code> مع <code>ThemeProvider</code> يحفظ الثيم (light/dark) ودالة toggle، ومكوّن يستخدمها بـ <code>useContext</code>.",["createContext","Provider","useContext","useState","value=","children","toggle"],
+`const ThemeContext=createContext();
+function ThemeProvider({children}){
+  const [theme,setTheme]=useState('light');
+  const toggle=()=>setTheme(t=>t==='light'?'dark':'light');
+  return <ThemeContext.Provider value={{theme,toggle}}>{children}</ThemeContext.Provider>;
+}
+function Btn(){
+  const {theme,toggle}=useContext(ThemeContext);
+  return <button onClick={toggle}>{theme}</button>;
+}`]);
+const $=s=>document.querySelector(s);let done=false,END=0,iv,L='ar';
+const DUR=3600000;
+const B=(a,e)=>`<span class="ar">${a}</span><span class="en">${e}</span>`;
+const sh=n=>{const a=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const rad=(n,o)=>sh(o.length).map(j=>`<label class="o"><input type="radio" name="${n}" value="${j}"> ${o[j]}</label>`).join('');
+const T=(a,e)=>L=='ar'?a:e;
+function build(){
+ let h=`<h2>${B('القسم 1: اختيار من متعدد','Part 1: Multiple Choice')} (${MCQ.length})</h2>`;
+ MCQ.forEach((q,i)=>{const e=EN[i];h+=`<div class="card" data-m="${i}"><h3>${i+1}. ${B(q[0],e[0])}</h3>`+rad('m'+i,q[1].map((o,j)=>B(o,e[1][j])))+'</div>'});
+ h+=`<h2>${B('القسم 2: أكمل الكود','Part 2: Complete the Code')}</h2><p class="sub">${B('اختر الإجابة الصحيحة من القوائم.','Pick the correct answer from each dropdown.')}</p>`;
+ FILL.forEach((f,i)=>{let n=0;const code=f.c.replace(/<S>/g,()=>{const k=n++;const o=f.a[Math.min(k,f.a.length-1)];return `<select data-f="${i}-${k}"><option value="">?</option>${sh(o.length).map(x=>`<option>${o[x]||'(empty)'}</option>`).join('')}</select>`});
+  h+=`<div class="card"><h3>${i+1}. ${B('أكمل:','Complete:')}</h3><pre>${code}</pre><div class="res" id="fr${i}"></div></div>`});
+ h+=`<h2>${B('القسم 3: جزء تفاعلي','Part 3: Interactive')}</h2><div class="card"><h3>${B('جرّب المكوّن ثم أجب','Try the component, then answer')}</h3>
+<pre>function Demo(){
+  const [n,setN]=useState(0);
+  const click=()=>{ setN(n+1); setN(n+1); setN(n+1); };
+  return &lt;button onClick={click}&gt;{n}&lt;/button&gt;;
+}</pre>
+<div class="demo"><button id="dm">Click (n = <span id="dn">0</span>)</button><button id="dr" style="background:var(--m)">Reset</button></div>
+<p class="sub">${B('الزر يحاكي المكوّن فعليًا (3 تحديثات بنفس القيمة القديمة).','The button simulates the component (3 updates using the same stale value).')}</p>
+<h3>I1. ${B('بعد الضغط مرة واحدة تصبح قيمة n:','After one click, n becomes:')}</h3>${rad('i1',['1','3','0'])}
+<h3>I2. ${B('ما الحل لتزيد 3 فعلًا؟','How do you make it really increase by 3?')}</h3>${rad('i2',[B('استخدام <code>setN(n=>n+1)</code> ثلاث مرات','Use <code>setN(n=>n+1)</code> three times'),B('استخدام <code>n++</code> ثلاث مرات','Use <code>n++</code> three times'),B('<code>setN(n+3)</code> بعد setTimeout فقط','<code>setN(n+3)</code> only after a setTimeout')])}</div>
+<div class="card"><h3>I3. ${B('رتّب دورة حياة المكوّن','Order the component lifecycle')}</h3><p>1) <select data-o="0"></select> 2) <select data-o="1"></select> 3) <select data-o="2"></select> 4) <select data-o="3"></select></p></div>
+<h2>${B('القسم 4: اكتب الكود','Part 4: Write the Code')}</h2><p class="sub">${B('اكتب الحل بنفسك. الدرجة تقديرية بالكلمات المفتاحية، وتظهر إجابة نموذجية بعد التسليم.','Write your own solution. The score is estimated by keywords; a model answer shows after submitting.')}</p>`;
+ CODE.forEach((c,i)=>{h+=`<div class="card"><h3>${i+1}. ${B(c[0],CODE_EN[i])}</h3><textarea data-c="${i}" spellcheck="false" placeholder="// code..."></textarea><div class="ans" id="ca${i}"></div></div>`});
+ h+=`<div style="text-align:center"><button class="big" id="sb">${B('تسليم الامتحان','Submit exam')}</button></div>`;
+ $('#ex').innerHTML=h;
+ const O=["Render (الرسم)","Mount (useEffect)","Update (state)","Unmount + cleanup"];
+ const os=sh(4);document.querySelectorAll('[data-o]').forEach(s=>{s.innerHTML='<option value="">?</option>'+os.map(j=>`<option value="${j}">${O[j]}</option>`).join('')});
+ let cur=0;$('#dm').onclick=()=>{const s=cur;cur=s+1;cur=s+1;cur=s+1;$('#dn').textContent=cur};
+ $('#dr').onclick=()=>{cur=0;$('#dn').textContent=0};
+ $('#sb').onclick=()=>{if(confirm(T('هل تريد تسليم الامتحان الآن؟','Submit the exam now?')))finish()};
+ $('#ex').addEventListener('change',prog);prog();
+}
+function prog(){const a=document.querySelectorAll('#ex input:checked').length+[...document.querySelectorAll('#ex select')].filter(s=>s.value).length;const t=MCQ.length+2+4+FILL.reduce((x,f)=>x+f.k.length,0);$('#pr').innerHTML=a+' / '+t+' '+B('مُجاب','answered')}
+function tick(){let r=END-Date.now();if(r<=0){clearInterval(iv);$('#tm').textContent='00:00';if(!done)finish();return}
+ const m=Math.floor(r/60000),s=Math.floor(r%60000/1000);$('#tm').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+ $('#tm').classList.toggle('low',r<300000);$('#bar').style.width=(r/DUR*100)+'%'}
+function start(){
+ const nm=$('#nm').value.trim();if(!nm){alert(T('اكتب اسمك أولًا','Please enter your name first'));return}
+ try{localStorage.setItem('sc_react_end',Date.now()+DUR);localStorage.setItem('sc_react_nm',nm)}catch(e){}
+ END=Date.now()+DUR;run()}
+function run(){$('#st').disabled=true;$('#nm').disabled=true;$('#ex').style.display='block';build();tick();iv=setInterval(tick,1000)}
+function finish(){
+ done=true;clearInterval(iv);let sc=0,tot=0;
+ MCQ.forEach((q,i)=>{tot++;const c=document.querySelector(`[data-m="${i}"]`);c.querySelector(`input[value="${q[2]}"]`).parentElement.classList.add('ok');const ch=c.querySelector('input:checked');
+  if(ch){if(+ch.value==q[2])sc++;else ch.parentElement.classList.add('no')}});
+ FILL.forEach((f,i)=>{let ok=0;f.k.forEach((k,j)=>{tot++;const s=document.querySelector(`[data-f="${i}-${j}"]`);const o=f.a[Math.min(j,f.a.length-1)];if(s.value===(o[k]||'(empty)')){sc++;ok++}});
+  $('#fr'+i).innerHTML='<span class="'+(ok==f.k.length?'good':'bad')+'">'+ok+' / '+f.k.length+'</span> — '+B('الإجابة','Answer')+': '+f.k.map((k,j)=>'<code>'+(f.a[Math.min(j,f.a.length-1)][k]||'(empty)')+'</code>').join(' , ')});
+ ['i1','i2'].forEach(n=>{tot++;document.querySelector(`input[name="${n}"][value="0"]`).parentElement.classList.add('ok');const ch=document.querySelector(`input[name="${n}"]:checked`);if(ch){if(ch.value==='0')sc++;else ch.parentElement.classList.add('no')}});
+ tot++;const ord=[...document.querySelectorAll('[data-o]')].map(s=>s.value).join()==='0,1,2,3';if(ord)sc++;
+ document.querySelector('[data-o]').closest('.card').insertAdjacentHTML('beforeend','<div class="res">Render → Mount → Update → Unmount (<span class="'+(ord?'good':'bad')+'">'+B(ord?'صحيح':'غير صحيح',ord?'correct':'incorrect')+'</span>)</div>');
+ CODE.forEach((c,i)=>{const v=document.querySelector(`[data-c="${i}"]`).value;let hit=0;c[1].forEach(k=>{if(new RegExp(k).test(v))hit++});const p=+(hit/c[1].length*5).toFixed(1);sc+=p;tot+=5;
+  const a=$('#ca'+i);a.style.display='block';a.innerHTML=`<b>${B('الدرجة التقديرية','Estimated score')}: ${p} / 5</b> (${hit}/${c[1].length} ${B('عناصر مطلوبة','required items')})<pre><code>${c[2].replace(/</g,'&lt;')}</code></pre>`});
+ sc=+sc.toFixed(1);const pc=Math.round(sc/tot*100);
+ const g=pc>=90?['ممتاز 🌟','Excellent 🌟']:pc>=75?['جيد جدًا 👏','Very good 👏']:pc>=60?['جيد 👍','Good 👍']:pc>=50?['مقبول','Pass']:['يحتاج مراجعة 📚','Needs review 📚'];
+ const sE=$('#score');sE.style.display='block';sE.innerHTML=`<b>${$('#nm').value||'—'}</b><br>${B('النتيجة','Score')}: <b>${sc} / ${tot}</b> (${pc}%) — ${B(g[0],g[1])}<br><span class="sub">Seacode Academy</span>`;
+ sE.scrollIntoView({behavior:'smooth'});$('#sb').disabled=true;document.querySelectorAll('#ex input,#ex textarea,#ex select').forEach(e=>e.disabled=true);
+ try{localStorage.removeItem('sc_react_end')}catch(e){}}
+$('#lg').onclick=()=>{L=L=='ar'?'en':'ar';document.body.dataset.l=L;document.documentElement.lang=L;document.documentElement.dir=L=='ar'?'rtl':'ltr';$('#lg').textContent=L=='ar'?'English':'عربي'};
+$('#st').onclick=start;
+try{const e=+localStorage.getItem('sc_react_end');if(e&&e>Date.now()){END=e;$('#nm').value=localStorage.getItem('sc_react_nm')||'';run()}}catch(e){}
+</script></body></html>
